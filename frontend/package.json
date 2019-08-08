@@ -1,0 +1,34 @@
+{
+  "name": "gamecanvas",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "prestart": "koji-tools watch &",
+    "start": "npm run dev",
+    "dev": "npx parcel common/index.html",
+    "build": "npx build parcel common/index.html",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postbuild": "koji-tools pwa"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "audio-play": "^2.2.1",
+    "game-asset-loader": "0.0.1",
+    "koji-tools": "^0.5.3",
+    "parcel-bundler": "^1.12.3",
+    "preact": "^8.5.1",
+    "prop-types": "^15.7.2",
+    "webfontloader": "^1.6.28"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.5.5",
+    "@babel/plugin-proposal-class-properties": "^7.5.5",
+    "@babel/plugin-syntax-dynamic-import": "^7.2.0",
+    "@babel/plugin-transform-react-jsx": "^7.3.0",
+    "babel-preset-preact": "^2.0.0",
+    "eslint": "^5.16.0"
+  }
+}
