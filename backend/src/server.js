@@ -40,7 +40,7 @@ leaderboard(app);
 // Start server
 app.listen(process.env.PORT || 3333, null, async err => {
     if (err) {
-        console.log(err.message);
+        console.error(err.message);
     }
     console.log('[koji] backend started');
 });

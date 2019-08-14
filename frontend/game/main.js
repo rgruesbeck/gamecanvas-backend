@@ -69,6 +69,7 @@ class Game {
         this.canvas = canvas; // game screen
         this.ctx = canvas.getContext("2d"); // game screen context
         this.audioCtx = audioContext();
+        this.playlist = [];
 
         // setup event listeners
         // handle keyboard events
@@ -227,6 +228,10 @@ class Game {
 
     play() {
         // update game characters
+        if (this.state.current === 'stop') {
+            this.cancelFrame();
+        }
+
 
         // clear the screen of the last picture
         this.ctx.fillStyle = this.config.colors.backgroundColor; 
@@ -274,11 +279,12 @@ class Game {
                 this.overlay.hide(['banner', 'button', 'instructions'])
             }
 
+            // play background music
             if (!this.state.muted && !this.state.backgroundMusic) {
-                let sound = this.sounds.backgroundMusic;
-                this.state.backgroundMusic = audioPlayback(sound, {
+                this.state.backgroundMusic = true;
+                this.playback('backgroundMusic', this.sounds.backgroundMusic, {
                     start: 0,
-                    end: sound.duration,
+                    end: this.sounds.backgroundMusic.duration,
                     loop: true,
                     context: this.audioCtx
                 });
@@ -318,7 +324,8 @@ class Game {
 
         // game over
         if (this.state.current === 'over') {
-            // game over code
+    window.setScore(this.state.score);
+    window.setAppView('setScore');
 
             window.setScore(this.state.score);
             window.setAppView('setScore');
@@ -431,7 +438,7 @@ class Game {
 
     handleResize() {
 
-        document.location.reload();
+// document.location.reload();
     }
 
     // pause game
@@ -484,9 +491,49 @@ class Game {
         }
     }
 
+    // method:playback
+    playback(key, audioBuffer, options = {}) {
+        if (this.state.muted) { return; }
+
+        // add to playlist
+        let id = Math.random().toString(16).slice(2);
+        this.playlist.push({
+            id: id,
+            key: key,
+            playback: audioPlayback(audioBuffer, {
+                ...{
+                    start: 0,
+                    end: audioBuffer.duration,
+                    context: this.audioCtx
+                },
+                ...options
+            }, () => {
+                // remove played sound from playlist
+                this.playlist = this.playlist
+                    .filter(s => s.id != id);
+            })
+        });
+    }
+
+    // method:stopPlayBack
+    stopPlayback(key) {
+        this.playlist = this.playlist
+        .filter(s => {
+            let targetBuffer = s.key === key;
+            if (targetBuffer) {
+                s.playback.pause();
+            }
+            return !targetBuffer;
+        })
+    }
+
+    stopPlaylist() {
+        this.playlist
+        .forEach(s => this.stopPlayback(s.key))
+    }
+
     // reset game
     reset() {
-        document.location.reload();
     }
 
     // update game state
@@ -518,6 +565,28 @@ class Game {
     // see game/helpers/animationframe.js for more information
     cancelFrame() {
         cancelAnimationFrame(this.frame.count);
+    }
+
+    destroy() {
+        // stop game loop and music
+        this.setState({ current: 'stop' })
+        this.stopPlaylist();
+
+        // cleanup event listeners
+        document.removeEventListener('keydown', this.handleKeyboardInput);
+        document.removeEventListener('keyup', this.handleKeyboardInput);
+        document.removeEventListener('mousemove', this.handleMouseMove);
+        document.removeEventListener('touchmove', this.handleTouchMove);
+        this.overlay.root.removeEventListener('click', this.handleClicks);
+        document.removeEventListener('touchstart', this.handleSwipe);
+        document.removeEventListener('touchmove', this.handleSwipe);
+        document.removeEventListener('touchend', this.handleSwipe);
+        window.removeEventListener('resize', this.handleResize);
+        window.removeEventListener("orientationchange", this.handleResize);
+
+        // cleanup nodes
+       delete this.overlay;
+       delete this.canvas;
     }
 }
 

@@ -1,3 +1,4 @@
+
 import { h, Component } from 'preact';
 import Koji from 'koji-tools';
 
@@ -7,6 +8,17 @@ class Leaderboard extends Component {
     dataIsLoaded: false,
     error: false,
   };
+
+  style = {
+    container: {
+      backgroundColor: Koji.config.colors.backgroundColor,
+      color: Koji.config.colors.textColor,
+      fontFamily: Koji.config.settings.fontFamily
+    },
+    row: {
+      backgroundColor: Koji.config.colors.primaryColor,
+    }
+  }
 
   componentDidMount() {
     fetch(`${Koji.config.serviceMap.backend}/leaderboard`)
@@ -23,7 +35,7 @@ class Leaderboard extends Component {
   render() {
     if (this.state.error) {
       return (
-        <div id={'leaderboard'}>
+        <div id={'leaderboard'} style={this.style.container}>
           <div className={'leaderboard-loading'}>
             <div>{'Error!'}</div>
             <button onClick={() => window.setAppView('game')}>
@@ -36,24 +48,28 @@ class Leaderboard extends Component {
 
     if (!this.state.dataIsLoaded) {
       return (
-        <div id={'leaderboard'}>
+        <div id={'leaderboard'} style={this.style.container}>
           <div className={'leaderboard-loading'}>
-            {'Loading...'}
+            <div style='display: flex; margin-top: 20vh; justify-content: center; text-align: center; animation-name: logo; animation-duration: 2s; animation-iteration-count: infinite; animation-timing-function: ease-out;'>
+            <div class='lds-ring'><div></div><div></div><div></div><div></div></div>
+	        </div>
           </div>
         </div>
       );
     }
 
     return (
-      <div id={'leaderboard'}>
+      <div id={'leaderboard'} style={this.style.container}>
         <div className={'leaderboard-container'}>
           <div class={'leaderboard-title'}>
-          <div class={'leaderboard-title-text'}>{'Top scores'}</div>
+          <div class={'leaderboard-title-text'}>
+            Top Scores
+          </div>
             <div
               class={'leaderboard-close-button'}
               onClick={() => { window.setAppView('game'); }}
             >
-              {'Close'}
+              Close
             </div>
           </div>
           <div className={'leaderboard-contents'}>
@@ -62,6 +78,7 @@ class Leaderboard extends Component {
                 <div
                   className={'score-row'}
                   key={index}
+                  style={this.style.row}
                 >
                   <div className={'name'}>
                     {`${index + 1}. ${score.name}`}
@@ -80,3 +97,4 @@ class Leaderboard extends Component {
 }
 
 export default Leaderboard;
+

@@ -57,15 +57,22 @@ class Sprite {
         let dx = x === 0 ? this.x : this.x + (x * this.speed * m);
         let dy = y === 0 ? this.y : this.y + (y * this.speed * m);
 
-        // target dx
-        dx = this.target.x != this.x ?
-        dx + ((this.target.x - this.x) / 1000 * this.speed) :
-        dx;
+        // move to active target
+        if (this.target.active) {
+            // target dx
+            dx = this.target.x != this.x ?
+            dx + ((this.target.x - this.x) / 1000 * this.speed) :
+            dx;
 
-        // target dy
-        dy = this.target.y != this.y ?
-        dy + ((this.target.y - this.y) / 1000 * this.speed) :
-        dy;
+            // target dy
+            dy = this.target.y != this.y ?
+            dy + ((this.target.y - this.y) / 1000 * this.speed) :
+            dy;
+
+            if (this.target.x === this.x && this.target.y === this.y) {
+                this.target.active = false;
+            }
+        }
         
         this.setX(dx);
         this.setY(dy);
@@ -78,7 +85,7 @@ class Sprite {
     moveTo(x = this.target.x, y = this.target.y) {
         this.target = {
             ...this.target,
-            ...{ x, y }
+            ...{ x, y, active: true }
         };
     }
 
